@@ -1,0 +1,27 @@
+[tasks.fmt-check]
+description = "フォーマットチェック"
+run = "cargo fmt --all -- --check"
+
+[tasks.check]
+description = "チェック"
+run = "cargo check --workspace --all-targets --locked"
+
+[tasks.test]
+description = "テスト"
+run = "cargo test --workspace --all-targets --locked"
+
+[tasks.verify]
+description = "fmt-check → check → testを順番に実行"
+run = [
+    { task = "fmt-check" },
+    { task = "check" },
+    { task = "test" }
+]
+
+[tasks.workspace-info]
+description = "Cargo metadataとdependency treeを表示"
+run = [
+    "cargo metadata --no-deps --locked --format-version 1" ,
+    "cargo tree --workspace --locked" 
+]
+
