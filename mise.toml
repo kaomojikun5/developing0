@@ -1,0 +1,68 @@
+[tools]
+python = "3.12.13"
+node = "24.19.0"
+"npm:pnpm" = "10.12.1"
+rust = "1.97.1"
+uv = "0.12.1"
+
+[tasks.setup]
+description = "セットアップ"
+run = [
+    "cargo fetch --locked" ,
+    "pnpm --dir orchestrator/frontend install --frozen-lockfile" ,
+    "uv sync --locked --project worker/engine"
+]
+
+[tasks.rust-fmt-check]
+description = "フォーマットチェック"
+run = "cargo fmt --all -- --check"
+
+[tasks.rust-check]
+description = "チェック"
+run = "cargo check --workspace --all-targets --locked"
+
+[tasks.rust-test]
+description = "テスト"
+run = "cargo test --workspace --all-targets --locked"
+
+[tasks.rust-verify]
+description = "fmt-check → check → testを順番に実行"
+run = [
+    { task = "rust-fmt-check" },
+    { task = "rust-check" },
+    { task = "rust-test" }
+]
+
+[tasks.frontend-verify]
+description = "frontend verify"
+run = [
+    "pnpm --dir orchestrator/frontend exec prettier --check src/",
+    "pnpm --dir orchestrator/frontend exec oxlint .",
+    "pnpm --dir orchestrator/frontend exec eslint .",
+    "pnpm --dir orchestrator/frontend run type-check",
+    "pnpm --dir orchestrator/frontend run test:unit -- --run",
+    "pnpm --dir orchestrator/frontend run build"
+]
+
+[tasks.engine-verify]
+description = "engine-verify"
+run = [
+    "uv lock --check --project worker/engine",
+    "uv run --frozen --no-sync --project worker/engine pocketswarm-engine"
+]
+
+[tasks.verify]
+description = "verify"
+run = [
+    { task = "rust-verify"},
+    { task = "frontend-verify"},
+    { task = "engine-verify"}
+]
+
+[tasks.workspace-info]
+description = "Cargo metadataとdependency treeを表示"
+run = [
+    "cargo metadata --no-deps --locked --format-version 1" ,
+    "cargo tree --workspace --locked" 
+]
+
