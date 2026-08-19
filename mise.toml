@@ -1,3 +1,10 @@
+[tools]
+python = "3.12.13"
+node = "24.19.0"
+"npm:pnpm" = "10.12.1"
+rust = "1.97.1"
+uv = "0.12.1"
+
 [tasks.fmt-check]
 description = "フォーマットチェック"
 run = "cargo fmt --all -- --check"
